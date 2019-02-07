@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+		
+	<context:component-scan base-package="com.rsy.ssm">
+		<!-- spring不负责扫描springmvc的controller -->
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<!-- classpath只向类路径
+		system-properties-mode, 如果properties有些键如果与取系统的某些值的键重复了，优先取系统的值，
+			例如:username, 提供的username的值为当前使用操作系统的用户(如：Administrator)
+		system-properties-mode设置never的时候，就是禁用获取系统的变量值。
+	 -->
+	<context:property-placeholder location="classpath:db.properties,classpath:common.properties" system-properties-mode="NEVER"/>
+	
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="url" value="${url}"></property>
+		<property name="username" value="${username}"></property>
+		<property name="password" value="${password}"></property>
+		<property name="driverClassName" value="${driver}"></property>
+		<property name="initialSize" value="5"></property>
+		<property name="minIdle" value="2"></property>
+		<property name="maxActive" value="8"></property>
+		<!-- 获取连接最大的等待时间，单位毫秒 -->
+		<property name="maxWait" value="60000"></property>
+		<!-- 检查连接是否有效, value 值根据数据库必须为有效的 sql -->
+		<property name="validationQuery" value="select 1"></property>
+		<!-- 当连接不够的时候，申请链接先执行以上 sql, 通常设置为 false，为提高性能，与 validationQuery 配合使用 -->
+		<property name="testOnBorrow" value="false"></property>
+		
+		<!-- 归还连接的时候执行的，通常设置为 false，为提高性能，与validationQuery 配合使用 -->
+		<property name="testOnReturn" value="false"></property>
+		<!-- 空闲的时候执行查询，通常设置为 true,不影响性能，与 validationQuery配合使用 -->
+		<property name="testWhileIdle" value="true"></property>
+		
+		<!-- 空闲连接在连接池中最小的生存时间, 毫米 -->
+		<property name="minEvictableIdleTimeMillis" value="300000"></property>
+		
+		<!-- 打开PSCache，并且指定每个连接上PSCache的大小 ,注意：如果用Oracle，则把 poolPreparedStatements 配置为 true，mysql 可以配置为 false。 -->
+		<property name="poolPreparedStatements" value="false"></property>
+		
+		<property name="maxPoolPreparedStatementPerConnectionSize" value="20"></property>
+	</bean>
+	
+	<!-- 获取SqlSessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<!-- 如果映射文件在多个目录下，用逗号分隔开  -->
+		<property name="mapperLocations" value="classpath:com/rsy/ssm/dao/*.xml"></property>
+		<property name="plugins">
+			<array>
+				<bean class="com.github.pagehelper.PageInterceptor">
+					<property name="properties">
+						<props>
+							<prop key="helperDialect">mysql</prop>
+						</props>
+					</property>
+				</bean>
+			</array>
+		</property>
+	</bean>
+	
+	<!-- 扫描包，将下面所有的接口生产实现类，并且将其纳入到spring的容器进行管理 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- You can set more than one package by using a semicolon or comma as a separator -->
+		<property name="basePackage" value="com.rsy.ssm.dao"></property>
+	</bean>
+	
+	<!-- 事务管理器 -->
+	<bean id="abcTransactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>	
+	
+	<!-- 开启事务 -->
+	<tx:annotation-driven transaction-manager="abcTransactionManager"/>
+	
+</beans>

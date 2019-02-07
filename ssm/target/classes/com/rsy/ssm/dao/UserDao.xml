@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsy.ssm.dao.UserDao">
+	
+	<resultMap type="com.rsy.ssm.domain.User" id="userMap">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="gender" property="gender"/>
+		<result column="email" property="email"/>
+		<result column="birthday" property="birthday"/>
+		<result column="updateTime" property="updateTime"/>
+		<result column="createTime" property="createTime"/>
+		<association property="company" javaType="com.rsy.ssm.domain.Company">
+			<id column="cid" property="id"/>
+			<result column="cname" property="name"/>
+		</association>
+	</resultMap>
+	
+	<sql id="queryCommonSql">
+		select u.id, u.name, u.gender, u.email, u.birthday, u.updateTime, 
+			u.createTime, c.id cid, c.name cname 
+			from user u join company c on u.company_id = c.id
+	</sql>
+	
+	<select id="findAll" parameterType="com.rsy.ssm.common.querybean.UserQuery" resultMap="userMap">
+		<include refid="queryCommonSql"></include>
+		<where>
+			<if test="null != name and !''.equals(name.trim())">
+				and u.name like concat('%', concat(#{name}, '%'))
+			</if>
+			<if test="null != gender and !'-1'.equals(gender)">
+				and u.gender = #{gender}
+			</if>
+			<if test="null != beginBirthday">
+				and u.birthday >= #{beginBirthday}
+			</if>
+			<if test="null != endBirthday">
+				<![CDATA[
+					and u.birthday <= #{endBirthday}
+				]]>
+			</if>
+			<if test="null != companyId and '-1' != companyId">
+				and c.id = #{companyId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getUserById" resultMap="userMap">
+		<include refid="queryCommonSql"></include>
+			where u.id = #{id} 
+	</select>
+	
+	<update id="update" parameterType="com.rsy.ssm.domain.User">
+		update user set name = #{name}, gender = #{gender}, birthday = #{birthday}, 
+			email = #{email}, company_id = #{company.id} where id = #{id}
+	</update>
+	
+	<delete id="deleteUser">
+		delete from user where id in 
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</delete>
+</mapper>

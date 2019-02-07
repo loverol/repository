@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+		
+	<context:component-scan base-package="com.rsy.ssm">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<!-- 让前端可以直接请求静态资源 -->	
+	<mvc:default-servlet-handler/>
+	
+	<!-- 
+		开启springmvc某些特殊处理的注解，例如：@DateTimeFormat
+	 -->	
+	<mvc:annotation-driven></mvc:annotation-driven>
+	
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="defaultEncoding" value="UTF-8" />
+		<!-- 文件大小，为 KB-->
+		<property name="maxUploadSize" value="2097152" />
+	</bean>
+	
+	<mvc:interceptors>
+		<mvc:interceptor>
+			<!-- 
+			   /** 会拦截所有的请求，例如/com; /com/xyz  /com/xyz/abc  
+			   /* 只会拦截 /com; /abc; /xyz, 而/com/xyz或者/com/xyz/abc就不会拦截
+			   /login  只会拦截/login
+			-->
+			<mvc:mapping path="/**"/>  
+			<mvc:exclude-mapping path="/login"/>
+			<mvc:exclude-mapping path="/**/*.png"/>
+			<mvc:exclude-mapping path="/**/*.jpg"/>
+			<mvc:exclude-mapping path="/**/*.gif"/>
+			<mvc:exclude-mapping path="/**/*.jpeg"/>
+			<mvc:exclude-mapping path="/**/*.css"/>
+			<mvc:exclude-mapping path="/**/*.less"/>
+			<mvc:exclude-mapping path="/**/*.eot"/>
+			<mvc:exclude-mapping path="/**/*.svg"/>
+			<mvc:exclude-mapping path="/**/*.ttf"/>
+			<mvc:exclude-mapping path="/**/*.woff"/>
+			<mvc:exclude-mapping path="/**/*.woff2"/>
+			<mvc:exclude-mapping path="/**/*.otf"/>
+			<mvc:exclude-mapping path="/**/*.js"/>
+			<bean class="com.rsy.ssm.interceptor.LoginInterceptor"></bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<mvc:mapping path="/**"/>
+			<mvc:exclude-mapping path="/login"/>
+			<mvc:exclude-mapping path="/index"/>
+			<mvc:exclude-mapping path="/**/*.png"/>
+			<mvc:exclude-mapping path="/**/*.jpg"/>
+			<mvc:exclude-mapping path="/**/*.gif"/>
+			<mvc:exclude-mapping path="/**/*.jpeg"/>
+			<mvc:exclude-mapping path="/**/*.css"/>
+			<mvc:exclude-mapping path="/**/*.less"/>
+			<mvc:exclude-mapping path="/**/*.eot"/>
+			<mvc:exclude-mapping path="/**/*.svg"/>
+			<mvc:exclude-mapping path="/**/*.ttf"/>
+			<mvc:exclude-mapping path="/**/*.woff"/>
+			<mvc:exclude-mapping path="/**/*.woff2"/>
+			<mvc:exclude-mapping path="/**/*.otf"/>
+			<mvc:exclude-mapping path="/**/*.js"/>
+			<bean class="com.rsy.ssm.interceptor.AjaxInterceptor"></bean>			
+		</mvc:interceptor>
+	</mvc:interceptors>
+	
+	<import resource="application.xml"/>
+</beans>

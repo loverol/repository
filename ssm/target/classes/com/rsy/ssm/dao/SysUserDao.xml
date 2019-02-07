@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+ 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.rsy.ssm.dao.SysUserDao">
+	
+	<select id="checkUsernameAndPassword" resultType="com.rsy.ssm.domain.SysUser">
+		select id, nicky_name nickname, password 
+			from sys_user where nicky_name = #{username} and password = #{password}
+	</select>
+</mapper>

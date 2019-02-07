@@ -1,0 +1,49 @@
+.navbar {
+	margin-bottom: 0;
+}
+#menu {
+	width: 200px;
+	position: absolute;
+	top: 50px;
+}
+#menu:before {
+	content: "";
+	width: 200px;
+	background-color: #E3E3E3;
+	position: fixed;
+	top: 50px;
+	bottom: 0;
+	z-index: -1;
+}
+div.panel-group div.panel {
+	border-radius: 0;
+	border:none;
+	border-right: 1px solid #E3E3E3;
+}
+div.panel-group div.panel div.panel-heading {
+	border-radius: 0;
+}
+#menu .panel .panel-heading a {
+	color: #FFFFFF;
+	text-decoration: none;
+}
+.content {
+	margin-left: 200px;
+	height: 500px;
+}
+.content .container-fluid .row {
+	margin-left: 0;
+	margin-right: 0;
+}
+.list-group .first, .list-group .last {
+	border-radius: 0;
+}
+.page-header {
+	margin-top: 20px;
+}
+.alert-panel{
+	padding-top: 5px;
+	padding-bottom: 5px;
+	position: relative;
+	top: 5px;
+}
